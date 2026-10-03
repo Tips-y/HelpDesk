@@ -1,34 +1,6 @@
-HelpDesk Student Assistance Queue 
+**HelpDesk Student Assistance Queue **
 
 Build a React application that manages student assistance requests during laboratory sessions. Use useState, useEffect, useRef, and useContext to connect user interactions, browser features, and shared interface settings. 
-
-Laboratory overview 
-
-Item 
-
-Specification 
-
-Duration 
-
-Refer to deadline set 
-
-Mode 
-
-Individual or pairs 
-
-Prerequisites 
-
-JSX, components, props, events, arrays, objects, and basic CSS 
-
-Tools 
-
-Node.js 22.12 or newer supported version, npm, VS Code, and a browser 
-
-Deliverable 
-
-A runnable React project with a demonstration and reflection answers 
-
- 
 
 Learning outcomes 
 
