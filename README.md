@@ -1,355 +1,371 @@
-**HelpDesk Student Assistance Queue **
+# HelpDesk Student Assistance Queue
 
-Build a React application that manages student assistance requests during laboratory sessions. Use useState, useEffect, useRef, and useContext to connect user interactions, browser features, and shared interface settings. 
+A React application that manages student assistance requests during laboratory sessions. Students can submit requests with a concern and priority, while the instructor can manage, resolve, filter, and delete requests.
 
-Learning outcomes 
+This project demonstrates the use of React hooks including `useState`, `useEffect`, `useRef`, and `useContext`.
 
-Manage primitive values and arrays of objects using useState. 
+## Features
 
-Synchronize requests with browser storage and the document title using useEffect. 
+- Submit student assistance requests
+- Validate student names and concerns
+- Set request priority to **High** or **Normal**
+- Automatically organize requests using a priority queue
+- High-priority requests appear before Normal requests
+- Older requests appear first within the same priority
+- Resolve waiting requests
+- Delete requests
+- Filter requests by:
+  - All
+  - Waiting
+  - Resolved
+- Display waiting, resolved, and total request counts
+- Save requests using `localStorage`
+- Restore requests after refreshing the browser
+- Automatically focus the student name field
+- Focus the concern field when the concern is empty
+- Switch between light and dark themes
+- Update the browser title based on the number of waiting requests
+- Responsive interface for narrow screens
+
+## Technologies Used
+
+- React
+- JavaScript
+- JSX
+- CSS
+- Vite
+- Node.js
+- npm
+- Browser Local Storage
+
+## React Hooks Used
+
+### `useState`
+
+Used to manage:
+
+- Request data
+- Selected status filter
+- Form input values
+- Theme
+- Storage warning state
+
+### `useEffect`
+
+Used to:
+
+- Save requests to `localStorage`
+- Update the browser document title
+- Focus inputs when needed
+- Handle synchronization with browser features
+
+### `useRef`
+
+Used to directly access form elements for input focus without causing unnecessary re-renders.
 
-Focus form inputs using useRef without modifying refs during rendering. 
+### `useContext`
+
+Used to share the application's theme settings across components without passing the theme through props.
+
+## Request Data Structure
+
+Each assistance request follows this structure:
 
-Share theme settings across components using useContext. 
+```javascript
+{
+  id: "unique-id",
+  studentName: "Ana",
+  concern: "My component does not update.",
+  priority: "High",
+  status: "Waiting",
+  createdAt: 1790000000000
+}
+```
 
-Explain immutable updates, effect dependencies, and derived values. 
+## Queue Behavior
 
-Scenario 
+Requests are sorted according to the following rules:
 
-Several students need assistance at the same time. Your application lets students enter their name, concern, and priority. The instructor views the queue, resolves requests, and deletes entries. High priority requests appear before Normal priority requests; within each priority, older requests appear first. 
+1. **High** priority requests appear before **Normal** priority requests.
+2. Requests with the same priority are sorted by `createdAt`.
+3. Older requests appear before newer requests.
+4. Requests are not modified directly when sorting or updating.
 
-This laboratory uses browser storage on one device. It does not provide shared access across devices or instructor authentication. 
+For example:
 
- 
+```text
+Ben   - High
+Cara  - High
+Ana   - Normal
+```
 
-Application requirements 
+If Ana was submitted first, followed by Ben and Cara, the queue will still place the High-priority requests first while maintaining their submission order.
 
-Feature 
+## Project Structure
 
-Required behavior 
+```text
+src/
+├── main.jsx
+├── App.jsx
+├── styles.css
+├── queue.js
+│
+├── context/
+│   └── ThemeContext.jsx
+│
+└── components/
+    ├── Header.jsx
+    ├── RequestForm.jsx
+    ├── QueueSummary.jsx
+    ├── RequestList.jsx
+    └── RequestCard.jsx
+```
 
-Request form 
+### Component Responsibilities
 
-Reject blank or whitespace-only names and concerns. 
+**App.jsx**
+- Owns the request data
+- Manages the selected filter
+- Handles adding, resolving, and deleting requests
+- Calculates derived values
 
-Priority queue 
+**RequestForm.jsx**
+- Handles student input
+- Validates form data
+- Creates new requests
+- Manages input focus
 
-High before Normal; first-in, first-out within each priority. 
+**Header.jsx**
+- Displays the application header
+- Provides the theme toggle
 
-Request actions 
+**QueueSummary.jsx**
+- Displays waiting, resolved, and total counts
 
-Resolve a waiting request and delete any request. 
+**RequestList.jsx**
+- Displays filtered and sorted requests
 
-Status filter 
+**RequestCard.jsx**
+- Displays individual request information
+- Provides Resolve and Delete actions
 
-Show All, Waiting, or Resolved requests. 
+**ThemeContext.jsx**
+- Provides shared theme settings
+- Contains the theme state and toggle function
 
-Summary 
+**queue.js**
+- Contains queue-related helper functions
 
-Display waiting, resolved, and total counts. 
+## Installation
 
-Persistence 
+### Prerequisites
 
-Restore requests and statuses after refreshing. 
+Make sure you have the following installed:
 
-Input focus 
+- Node.js 22.12 or newer supported version
+- npm
+- VS Code
+- A modern web browser
 
-Focus the name field on mount and after a valid submission. 
+### Clone the Repository
 
-Theme 
+```bash
+git clone <your-repository-url>
+cd <your-project-folder>
+```
 
-Switch the interface between light and dark through context. 
+### Install Dependencies
 
- 
+```bash
+npm install
+```
 
-Recommended file organization 
+### Start the Development Server
 
-src/ 
+```bash
+npm run dev
+```
 
-  main.jsx 
+Open the local development URL shown in the terminal, usually:
 
-  App.jsx 
+```text
+http://localhost:5173/
+```
 
-  styles.css 
+## Testing
 
-  queue.js 
+The following test cases were used to verify the application.
 
-  context/ThemeContext.jsx 
+| Test | Expected Result |
+|---|---|
+| Submit a blank name | Submission is rejected and the name field is focused |
+| Submit a blank concern | Submission is rejected and the concern field is focused |
+| Add Ana Normal, Ben High, Cara High | Requests appear as Ben, Cara, Ana |
+| Resolve Ben | Waiting count decreases and resolved count increases |
+| Select Waiting | Only waiting requests are displayed |
+| Select Resolved | Only resolved requests are displayed |
+| Refresh the browser | Requests and statuses remain |
+| Delete Cara | Cara is removed and counts are updated |
+| Switch theme | All theme consumers update |
+| Submit a valid request | Form resets and name field receives focus |
 
-  components/Header.jsx 
+## Browser Storage
 
-  components/RequestForm.jsx 
+The application uses `localStorage` to persist requests.
 
-  components/QueueSummary.jsx 
+The requests are stored using the key:
 
-  components/RequestList.jsx 
+```text
+helpdesk-requests
+```
 
-  components/RequestCard.jsx 
+Requests are loaded when the application starts and saved whenever the request state changes.
 
- 
+If browser storage is unavailable, the application displays a warning instead of preventing the application from running.
 
-App owns request data and passes it through props. ThemeProvider sits above App and provides the shared theme. Keep React StrictMode enabled. 
+## Responsive Design
 
- 
+The interface is designed to remain usable on smaller screens. Form fields, filters, request cards, and action buttons adjust to fit narrow screen sizes.
 
-Task 1 Build the interface 
+## Important React Concepts Demonstrated
 
- 
+### Immutable State Updates
 
-Create the recommended components and import them into App. 
+Existing state arrays and objects are not modified directly.
 
-Add a name input, concern textarea, priority dropdown, and submit button. 
+Instead of:
 
-Add a status filter, queue summary, and request cards with Resolve and Delete buttons. 
+```javascript
+requests.push(newRequest);
+```
 
-Use two temporary sample requests to check the layout. Give each list item a stable request ID as its key. 
+the application creates a new array:
 
-Use visible labels and a layout that remains usable on a narrow screen. 
+```javascript
+setRequests(previous => [...previous, newRequest]);
+```
 
-Checkpoint: All components render, fields have labels, and request cards display the expected information. 
+Requests are also updated using `map()` and removed using `filter()`.
 
-Task 2 Manage requests using useState 
+### Functional State Updates
 
- 
+Functional updates are used when the new state depends on the previous state:
 
-Store requests and the selected filter in App. Store form inputs in RequestForm. Each request must use the following data structure. 
+```javascript
+setRequests(previous => [
+  ...previous,
+  newRequest
+]);
+```
 
-{ 
+### Derived Values
 
-  id: "unique-id", 
+Queue counts and filtered requests are calculated directly from the current request state instead of being stored as separate state values.
 
-  studentName: "Ana", 
+This prevents duplicated state and keeps the interface consistent.
 
-  concern: "My component does not update.", 
+### Effect Dependencies
 
-  priority: "High", 
+Each effect includes the values it depends on.
 
-  status: "Waiting", 
+For example, the storage effect depends on `requests`:
 
-  createdAt: 1790000000000 
+```javascript
+useEffect(() => {
+  localStorage.setItem(
+    "helpdesk-requests",
+    JSON.stringify(requests)
+  );
+}, [requests]);
+```
 
-} 
+The document title effect depends on `waitingCount`:
 
- 
+```javascript
+useEffect(() => {
+  const originalTitle = document.title;
 
-Create controlled inputs using value and onChange. 
+  document.title = `HelpDesk — ${waitingCount} waiting`;
 
-Prevent default form submission and validate trimmed inputs. 
+  return () => {
+    document.title = originalTitle;
+  };
+}, [waitingCount]);
+```
 
-Create an ID with crypto.randomUUID() and a timestamp with Date.now() inside the submit handler. 
+### Refs and Input Focus
 
-Append the request using a functional state update; reset the form after success. 
+`useRef` is used when the application needs direct access to a DOM element.
 
-Implement resolve using map() and delete using filter(). 
+```javascript
+const nameInputRef = useRef(null);
+```
 
-Calculate counts and the filtered list directly from requests during rendering. 
+The reference can then be used to focus the input:
 
-setRequests(previous => [...previous, newRequest]); 
+```javascript
+nameInputRef.current?.focus();
+```
 
- 
+### Context
 
-setRequests(previous => 
+The theme is shared using React Context so components such as the header, form, and request cards can access the theme without passing it through intermediate components as props.
 
-  previous.map(request => 
+## Reflection
 
-    request.id === requestId 
+### Why is the request list stored in state rather than a ref?
 
-      ? { ...request, status: "Resolved" } 
+The request list is stored in state because changes to the requests need to update and re-render the interface. A ref does not cause a component to re-render when its value changes.
 
-      : request 
+### Why must existing state arrays and objects remain unmodified?
 
-  ) 
+They must remain unmodified so React can properly detect changes and update the interface. Instead of changing the original array or object, a new copy should be created using methods such as `map()`, `filter()`, or the spread operator.
 
-); 
+### When should you use a functional state update?
 
- 
+A functional state update should be used when the new state depends on the previous state. For example:
 
-Important: Do not mutate state with push(), direct object assignment, or sort() on the original state array. Filter first or copy the array before sorting. Compare priority first, then createdAt. 
+```javascript
+setRequests(previous => [
+  ...previous,
+  newRequest
+]);
+```
 
-Checkpoint: Add three requests, resolve one, and delete another. Counts must remain consistent. 
+### What does each effect dependency array control in this application?
 
- 
+The dependency array controls when an effect runs again. The storage effect runs when `requests` changes, while the document title effect runs when `waitingCount` changes. An empty dependency array makes the focus effect run when the component mounts.
 
-Task 3 Synchronize using useEffect 
+### Why is an input ref appropriate for focus management?
 
- 
+An input ref provides direct access to the DOM element, allowing the application to call `.focus()` when needed. This is useful for focusing the name field when the form mounts or after a valid submission.
 
-Initialize requests from browser storage before the saving effect runs. A lazy state initializer prevents an initially empty queue from overwriting saved requests. 
+### How does context reduce passing props through intermediate components?
 
-const [requests, setRequests] = useState(() => { 
+Context allows shared values such as the theme and theme toggle function to be accessed directly by components that need them. This avoids passing the theme through multiple intermediate components using props.
 
-  try { 
+### Why are filtered requests and queue counts calculated during rendering?
 
-    const saved = JSON.parse( 
+They are derived values that can be calculated directly from the current requests state. Storing them separately in state or using effects would create unnecessary state and could cause the values to become inconsistent.
 
-      localStorage.getItem("helpdesk-requests") ?? "[]" 
+## Limitations
 
-    ); 
+- Requests are stored only on the current browser/device.
+- Requests are not synchronized between different devices.
+- There is no instructor authentication.
+- There is no backend database.
+- Clearing browser storage will remove saved requests.
 
-    return Array.isArray(saved) ? saved : []; 
+## References
 
-  } catch { 
+- [React `useState`](https://react.dev/reference/react/useState)
+- [React `useEffect`](https://react.dev/reference/react/useEffect)
+- [React `useRef`](https://react.dev/reference/react/useRef)
+- [React `useContext`](https://react.dev/reference/react/useContext)
 
-    return []; 
+## Project Information
 
-  } 
-
-}); 
-
- 
-
-For a robust solution, validate each stored record before displaying it. The supplied solution includes the isRequest helper for this purpose. 
-
-useEffect(() => { 
-
-  try { 
-
-    localStorage.setItem( 
-
-      "helpdesk-requests", JSON.stringify(requests) 
-
-    ); 
-
-  } catch { 
-
-    // Display a warning that persistence is unavailable. 
-
-  } 
-
-}, [requests]); 
-
- 
-
-Add a storage warning state and display an informative message if saving fails. 
-
-Calculate waitingCount directly from requests. 
-
-Update the document title whenever waitingCount changes. 
-
-Refresh the page and verify that requests and statuses return. 
-
-useEffect(() => { 
-
-  const originalTitle = document.title; 
-
-  document.title = `HelpDesk — ${waitingCount} waiting`; 
-
-  return () => { 
-
-    document.title = originalTitle; 
-
-  }; 
-
-}, [waitingCount]); 
-
- 
-
-Things to note 
-
-Effects synchronize with systems outside React. Form submission belongs in an event handler. 
-
-Include reactive values used by an effect in its dependency array. 
-
-Cleanup runs before the effect is set up again and when the component unmounts. 
-
-StrictMode may run an extra setup and cleanup cycle during development. 
-
-Filtering and counting are derived calculations; do not create effects just to copy these values into state. 
-
-Checkpoint: Saved requests survive refresh, and the browser title matches the waiting count. 
-
- 
-
-Task 4 Focus inputs using useRef 
-
- 
-
-Create a DOM ref in RequestForm and attach it to the student-name input. 
-
-const nameInputRef = useRef(null); 
-
- 
-
-useEffect(() => { 
-
-  nameInputRef.current?.focus(); 
-
-}, []); 
-
- 
-
-<input 
-
-  ref={nameInputRef} 
-
-  value={studentName} 
-
-  onChange={event => setStudentName(event.target.value)} 
-
-/> 
-
- 
-
-Focus the name input when RequestForm mounts. 
-
-After a valid submission, reset the fields and focus the name input again. 
-
-For a blank name, reject submission and focus the name field. 
-
-Add a separate ref for the concern textarea and focus it if the concern is blank. 
-
-Important: Read DOM refs in effects or event handlers. Changing ref.current does not cause a render, so visible counts belong in state or derived calculations. 
-
-Checkpoint: Complete successive submissions using the keyboard without clicking the name field. 
-
-Task 5 Share the theme using useContext 
-
- 
-
-Create a context at module scope. Keep the theme state inside its provider and wrap App with that provider in main.jsx. 
-
-const ThemeContext = createContext(null); 
-
- 
-
-function ThemeProvider({ children }) { 
-
-  const [theme, setTheme] = useState("light"); 
-
-  const toggleTheme = () => setTheme(previous => 
-
-    previous === "light" ? "dark" : "light" 
-
-  ); 
-
-  return ( 
-
-    <ThemeContext.Provider value={{ theme, toggleTheme }}> 
-
-      {children} 
-
-    </ThemeContext.Provider> 
-
-  ); 
-
-} 
-
- 
-
-Import createContext, useState, and useContext from React where they are used. Export the provider and context, or use a custom useTheme hook as in the supplied solution. 
-
-Read the provided object with const { theme, toggleTheme } = useContext(ThemeContext). Use toggleTheme in Header and theme in the interface components. 
-
-Checkpoint: The header, form, and request cards update together. Do not pass theme through props. A provider must be above the component that reads it. 
-
- 
-
-Official references 
-
-React useState reference   https://react.dev/reference/react/useState 
-
-React useEffect reference   https://react.dev/reference/react/useEffect 
-
-React useRef reference   https://react.dev/reference/react/useRef 
-
-React useContext reference   https://react.dev/reference/react/useContext 
+**Project:** HelpDesk Student Assistance Queue  
+**Type:** React Laboratory Project  
+**Mode:** Individual or Pair  
+**Purpose:** Demonstrate React state management, effects, refs, context, browser storage, and derived values.
